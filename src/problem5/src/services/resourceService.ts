@@ -1,26 +1,34 @@
-import { ResourceRepository } from '../repositories/resourceRepository';
 import { Resource } from '../models/types';
+import { 
+  IResourceRepository, 
+  IResourceService, 
+  ListResourcesOptions, 
+  ListResourcesResult, 
+  CreateResourceData, 
+  UpdateResourceData, 
+  PartialUpdateResourceData 
+} from '../models/interfaces';
 
-export class ResourceService {
-  private repository: ResourceRepository;
+/**
+ * Service for Resource business logic
+ * Implements IResourceService for dependency injection and testing
+ */
+export class ResourceService implements IResourceService {
+  private repository: IResourceRepository;
 
-  constructor() {
-    this.repository = new ResourceRepository();
+  /**
+   * @param repository - Resource repository instance (injected for testability)
+   */
+  constructor(repository: IResourceRepository) {
+    this.repository = repository;
   }
 
-  async createResource(data: { name: string; description: string | null }): Promise<Resource> {
+  async createResource(data: CreateResourceData): Promise<Resource> {
     return this.repository.create(data);
   }
 
-  async listResources(filters: { 
-    name?: string; 
-    description?: string;
-    limit: number;
-    offset: number;
-    sort: string;
-    order: 'asc' | 'desc';
-  }): Promise<{ data: Resource[]; total: number }> {
-    return this.repository.findAll(filters);
+  async listResources(options: ListResourcesOptions): Promise<ListResourcesResult> {
+    return this.repository.findAll(options);
   }
 
   async getResource(id: number): Promise<Resource | undefined> {
@@ -31,11 +39,11 @@ export class ResourceService {
     return this.repository.findByName(name);
   }
 
-  async updateResource(id: number, data: { name: string; description: string | null }): Promise<Resource | undefined> {
+  async updateResource(id: number, data: UpdateResourceData): Promise<Resource | undefined> {
     return this.repository.update(id, data);
   }
 
-  async partialUpdateResource(id: number, data: Partial<{ name: string; description: string | null }>): Promise<Resource | undefined> {
+  async partialUpdateResource(id: number, data: PartialUpdateResourceData): Promise<Resource | undefined> {
     return this.repository.partialUpdate(id, data);
   }
 

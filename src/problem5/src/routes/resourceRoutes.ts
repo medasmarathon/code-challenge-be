@@ -9,55 +9,63 @@ import {
   listResourcesQuerySchema
 } from '../schemas/resourceSchema';
 
-const router = Router();
-const controller = new ResourceController();
-
 /**
- * RESTful CRUD endpoints for resources
+ * Creates resource routes with injected controller
+ * Enables dependency injection for testing
  * 
- * Base path: /api/v1/resources (mounted in app.ts)
- * 
- * Endpoints:
- * - POST   /              Create a new resource
- * - GET    /              List resources (with pagination, filtering, sorting)
- * - GET    /:id           Get a single resource
- * - PUT    /:id           Full replacement update
- * - PATCH  /:id           Partial update
- * - DELETE /:id           Delete a resource
+ * @param controller - ResourceController instance (injected for testability)
+ * @returns Express Router with all resource routes configured
  */
+export function createResourceRoutes(controller: ResourceController): Router {
+  const router = Router();
 
-// Collection routes
-router.post('/', 
-  validateBody(createResourceSchema), 
-  controller.create
-);
+  /**
+   * RESTful CRUD endpoints for resources
+   * 
+   * Base path: /api/v1/resources (mounted in app.ts)
+   * 
+   * Endpoints:
+   * - POST   /              Create a new resource
+   * - GET    /              List resources (with pagination, filtering, sorting)
+   * - GET    /:id           Get a single resource
+   * - PUT    /:id           Full replacement update
+   * - PATCH  /:id           Partial update
+   * - DELETE /:id           Delete a resource
+   */
 
-router.get('/', 
-  validateQuery(listResourcesQuerySchema),
-  controller.list
-);
+  // Collection routes
+  router.post('/', 
+    validateBody(createResourceSchema), 
+    controller.create
+  );
 
-// Item routes (with ID validation)
-router.get('/:id', 
-  validateParams(idParamSchema), 
-  controller.get
-);
+  router.get('/', 
+    validateQuery(listResourcesQuerySchema),
+    controller.list
+  );
 
-router.put('/:id', 
-  validateParams(idParamSchema), 
-  validateBody(updateResourceSchema), 
-  controller.update
-);
+  // Item routes (with ID validation)
+  router.get('/:id', 
+    validateParams(idParamSchema), 
+    controller.get
+  );
 
-router.patch('/:id', 
-  validateParams(idParamSchema), 
-  validateBody(partialUpdateResourceSchema), 
-  controller.partialUpdate
-);
+  router.put('/:id', 
+    validateParams(idParamSchema), 
+    validateBody(updateResourceSchema), 
+    controller.update
+  );
 
-router.delete('/:id', 
-  validateParams(idParamSchema), 
-  controller.delete
-);
+  router.patch('/:id', 
+    validateParams(idParamSchema), 
+    validateBody(partialUpdateResourceSchema), 
+    controller.partialUpdate
+  );
 
-export default router;
+  router.delete('/:id', 
+    validateParams(idParamSchema), 
+    controller.delete
+  );
+
+  return router;
+}

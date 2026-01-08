@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ResourceService } from '../services/resourceService';
+import { IResourceService } from '../models/interfaces';
 import { Errors } from '../utils/AppError';
 import { asyncHandler } from '../utils/asyncHandler';
 import { HttpStatus, ResourceFields, ResourceName, SortOrder } from '../utils/constants';
@@ -10,11 +10,18 @@ import {
   ListResourcesQuery
 } from '../schemas/resourceSchema';
 
+/**
+ * Controller for Resource HTTP endpoints
+ * Handles request/response, delegates business logic to service layer
+ */
 export class ResourceController {
-  private service: ResourceService;
+  private service: IResourceService;
 
-  constructor() {
-    this.service = new ResourceService();
+  /**
+   * @param service - Resource service instance (injected for testability)
+   */
+  constructor(service: IResourceService) {
+    this.service = service;
   }
 
   /**
